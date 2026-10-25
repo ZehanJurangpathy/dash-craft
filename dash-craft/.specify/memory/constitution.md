@@ -1,3 +1,31 @@
+<!--
+Sync Impact Report
+==================
+Version change: 1.0.0 → 1.1.0
+Bump rationale: MINOR. Adds a narrowly scoped, condition-bound exception (materially expanded
+guidance). No principle is removed or redefined, and every other endpoint still requires
+authorization, so this is not a backward-incompatible change.
+
+Modified principles:
+  - II. Role-Based Capabilities: added the "Health endpoint exception" bullet.
+
+Modified sections:
+  - Security: the "protect all endpoints" rule now references the Principle II exception.
+
+Added sections: none
+Removed sections: none
+
+Templates requiring updates: none (dependent templates read the constitution at runtime).
+
+Dependent artifacts to re-check (not modified by this command):
+  ✅ specs/001-project-foundation/plan.md: the Complexity Tracking row was removed and the
+    Constitution Check row II now cites the exception.
+  ✅ specs/001-project-foundation/tasks.md: T048 now cites the rule in code.
+    T038/T043 provide the required no-leak tests.
+
+Follow-up TODOs: none.
+-->
+
 # DashCraft Constitution
 
 DashCraft is an open-source, self-hostable dashboard builder that lets users visually query
@@ -56,6 +84,15 @@ generation, AST-based allowlist validation, parameterization, and read-only data
   Admin SQL is subject to all rules in Principle I and MUST NOT bypass the validator.
 - Authorization MUST be enforced on the server for every endpoint and command. UI hiding is a
   convenience, never a security control.
+- **Health endpoint exception**: a health endpoint MAY be anonymous, and is the only endpoint
+  that may be, if all of the following hold:
+  - it returns only status names (e.g., Healthy/Degraded/Unhealthy), dependency names, timings,
+    and fixed generic messages;
+  - it never returns exception text, connection strings, host names, credentials,
+    configuration, version details, or any user or database data;
+  - it is read-only and has no side effects;
+  - it is explicitly marked anonymous in code with a reference to this rule;
+  - an automated test asserts that a failing dependency's response leaks none of the above.
 - Admin-written SQL MUST be audit logged (who, when, which connection) without logging secrets
   or result data.
 
@@ -182,7 +219,8 @@ that prove them; adversarial and real-database tests catch what reviews miss.
 
 ## Security
 
-- Authentication and authorization MUST protect all endpoints. Users MUST only access
+- Authentication and authorization MUST protect all endpoints, except a health endpoint that
+  meets the Health endpoint exception in Principle II. Users MUST only access
   connections and dashboards they are permitted to see.
 - All input MUST be validated and sanitized on both client and server; the server is the
   source of truth.
@@ -203,4 +241,4 @@ that prove them; adversarial and real-database tests catch what reviews miss.
 - Keep it simple. Every new dependency requires a clear, documented justification and a
   license check (Principle IV).
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-25 | **Last Amended**: 2026-10-25
+**Version**: 1.1.0 | **Ratified**: 2026-10-25 | **Last Amended**: 2026-10-25
