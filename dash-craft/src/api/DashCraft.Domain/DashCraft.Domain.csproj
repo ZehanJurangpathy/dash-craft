@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Domain has no dependencies on other layers or packages (constitution: Backend structure). -->
+
+</Project>

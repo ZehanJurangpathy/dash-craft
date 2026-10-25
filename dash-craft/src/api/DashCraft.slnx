@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/tests/">
+    <Project Path="../../tests/api/DashCraft.Api.Tests/DashCraft.Api.Tests.csproj" />
+    <Project Path="../../tests/api/DashCraft.Application.Tests/DashCraft.Application.Tests.csproj" />
+    <Project Path="../../tests/api/DashCraft.Domain.Tests/DashCraft.Domain.Tests.csproj" />
+    <Project Path="../../tests/api/DashCraft.Infrastructure.Tests/DashCraft.Infrastructure.Tests.csproj" />
+    <Project Path="../../tests/api/DashCraft.IntegrationTests/DashCraft.IntegrationTests.csproj" />
+  </Folder>
+  <Project Path="DashCraft.Api/DashCraft.Api.csproj" />
+  <Project Path="DashCraft.Application/DashCraft.Application.csproj" />
+  <Project Path="DashCraft.Domain/DashCraft.Domain.csproj" />
+  <Project Path="DashCraft.Infrastructure/DashCraft.Infrastructure.csproj" />
+</Solution>

@@ -1,0 +1,68 @@
+name: CI
+
+# The DashCraft project lives in the dash-craft/ subfolder of this repository.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+  TESTINGPLATFORM_TELEMETRY_OPTOUT: "1"
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dash-craft
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: dash-craft/global.json
+      - name: Restore
+        run: dotnet restore src/api/DashCraft.slnx
+      - name: Build
+        run: dotnet build src/api/DashCraft.slnx -c Release --no-restore
+      - name: Unit tests
+        run: dotnet test --solution src/api/DashCraft.Unit.slnf -c Release --no-build
+      - name: Integration tests (SQL Server via Testcontainers)
+        run: dotnet test --project tests/api/DashCraft.IntegrationTests -c Release --no-build
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dash-craft/src/web
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: dash-craft/src/web/package-lock.json
+      - run: npm ci --no-fund
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dash-craft
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build images
+        run: docker compose build

@@ -1,0 +1,15 @@
+{
+  "solution": {
+    "path": "DashCraft.slnx",
+    "projects": [
+      "DashCraft.Domain/DashCraft.Domain.csproj",
+      "DashCraft.Application/DashCraft.Application.csproj",
+      "DashCraft.Infrastructure/DashCraft.Infrastructure.csproj",
+      "DashCraft.Api/DashCraft.Api.csproj",
+      "../../tests/api/DashCraft.Domain.Tests/DashCraft.Domain.Tests.csproj",
+      "../../tests/api/DashCraft.Application.Tests/DashCraft.Application.Tests.csproj",
+      "../../tests/api/DashCraft.Infrastructure.Tests/DashCraft.Infrastructure.Tests.csproj",
+      "../../tests/api/DashCraft.Api.Tests/DashCraft.Api.Tests.csproj"
+    ]
+  }
+}

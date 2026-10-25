@@ -40,14 +40,15 @@ workflow runs all of it. Every package version and license was verified on 2026-
   - React 19.3.1, Vite 8.3.5, React Router 8.5.0
   - TanStack Query 5.104.5, TanStack Table 9.3.1
   - Tailwind CSS 4.3.3
-  - React Hook Form 7.91.0, Zod 4.6.7, @hookform/resolvers 6.0.0
+  - React Hook Form 7.91.0, Zod 4.6.7, @hookform/resolvers 5.9.2 (6.0.0 has broken peers; research §1.5)
 
 **Storage**: SQL Server 2025 (`mcr.microsoft.com/mssql/server:2025-CU10-ubuntu-24.04`) for the
 DashCraft application database via EF Core Code First; persisted in a named Docker volume
 
 **Testing**:
-- **Backend**: xunit.v3 4.0.2 + Shouldly 4.3.0; Microsoft.AspNetCore.Mvc.Testing 10.0.13 and
-  Testcontainers.MsSql 4.16.0 for integration tests
+- **Backend**: xunit.v3 4.0.2 + Shouldly 4.3.0 on Microsoft.Testing.Platform (enabled in
+  `global.json`); Microsoft.AspNetCore.Mvc.Testing 10.0.13 and Testcontainers.MsSql 4.16.0 for
+  integration tests
 - **Frontend**: Vitest 5.0.5 + React Testing Library 16.3.3 + jsdom 30.1.3
 
 **Target Platform**: Linux containers (Docker Compose v2+); developer machines on Windows, macOS,
@@ -109,7 +110,6 @@ specs/001-project-foundation/
 
 ```text
 .
-├── .github/workflows/ci.yml          # backend, frontend, docker jobs
 ├── .config/dotnet-tools.json         # dotnet-ef 10.0.13 (local tool)
 ├── .editorconfig                     # C#/TS style; Mapperly RMG012/RMG020 = error
 ├── .gitignore  .gitattributes
@@ -124,6 +124,7 @@ specs/001-project-foundation/
 ├── src/
 │   ├── api/
 │   │   ├── DashCraft.slnx
+│   │   ├── DashCraft.Unit.slnf       # solution filter: layers + unit test projects
 │   │   ├── Dockerfile                # sdk:10.0 build -> aspnet:10.0 runtime (non-root)
 │   │   ├── DashCraft.Domain/         # no package references; DomainAssembly marker
 │   │   ├── DashCraft.Application/
@@ -176,6 +177,9 @@ specs/001-project-foundation/
         ├── DashCraft.Api.Tests/
         └── DashCraft.IntegrationTests/   # WebApplicationFactory + Testcontainers fixture
 ```
+
+**CI location**: the git repository root is the parent folder of this project, so the workflow
+lives at `<repo>/.github/workflows/ci.yml` and runs every job in `dash-craft/`.
 
 **Structure Decision**: This is the monorepo layout from the constitution: `/src/api` holds the
 .NET solution, `/src/web` the SPA, `/tests/api` all backend tests, and Docker files sit at the

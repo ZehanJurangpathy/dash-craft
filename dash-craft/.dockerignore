@@ -1,0 +1,19 @@
+# Build context for the API image (repository root).
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/coverage
+**/*.log
+.git
+.vs
+.vscode
+.idea
+.env
+.env.*
+tests/
+specs/
+prompts/
+.specify/
+.claude/
+src/web/

@@ -20,7 +20,7 @@ Default ports: web `8080`, API `5080`, SQL Server `14330`. Override them in `.en
 ## Scenario 1: Start the system with one command (US1, FR-001 to FR-007)
 
 ```bash
-git clone <repo-url> dash-craft && cd dash-craft
+git clone <repo-url> && cd <repo>/dash-craft
 docker compose up -d --build
 ```
 
@@ -59,10 +59,10 @@ Repeat 3 times. `docker compose down -v` is the documented way to wipe local dat
 
 ```bash
 # Backend unit tests (no Docker needed)
-dotnet test src/api/DashCraft.slnx --filter "FullyQualifiedName!~IntegrationTests"
+dotnet test --solution src/api/DashCraft.Unit.slnf
 
 # Backend integration tests (Docker required; starts and removes a SQL Server container)
-dotnet test tests/api/DashCraft.IntegrationTests
+dotnet test --project tests/api/DashCraft.IntegrationTests
 
 # Frontend
 cd src/web && npm ci && npm run lint && npm run typecheck && npm test

@@ -41,7 +41,7 @@ on its own.
   - Microsoft.SqlServer.TransactSql.ScriptDom 180.140.0
   - FluentValidation / FluentValidation.DependencyInjectionExtensions 12.2.0
   - Microsoft.AspNetCore.OpenApi 10.0.13
-  - xunit.v3 4.0.2, xunit.runner.visualstudio 4.0.1, Microsoft.NET.Test.Sdk 18.11.0
+  - xunit.v3 4.0.2 on Microsoft.Testing.Platform (VSTest packages dropped during implementation; research.md §9)
   - Shouldly 4.3.0
   - Microsoft.AspNetCore.Mvc.Testing 10.0.13, Testcontainers.MsSql 4.16.0
   - Local tool: dotnet-ef 10.0.13
@@ -50,7 +50,7 @@ on its own.
     - react / react-dom 19.3.1
     - react-router 8.5.0
     - @tanstack/react-query 5.104.5, @tanstack/react-table 9.3.1
-    - react-hook-form 7.91.0, zod 4.6.7, @hookform/resolvers 6.0.0
+    - react-hook-form 7.91.0, zod 4.6.7, @hookform/resolvers 5.9.2 (see research.md §1.5)
   - Build and styling:
     - vite 8.3.5, @vitejs/plugin-react 6.1.2
     - tailwindcss / @tailwindcss/vite 4.3.3
@@ -82,26 +82,26 @@ msw, xunit v2), nor MediatR or AutoMapper.
 
 **Purpose**: Repository scaffolding, solution, projects, and toolchains
 
-- [ ] T001 [P] Create `LICENSE` at the repo root with the standard MIT License text and `Copyright (c) 2026 The DashCraft Authors`
-- [ ] T002 Create `global.json` at the repo root pinning `"sdk": { "version": "10.0.401", "rollForward": "latestFeature" }`
-- [ ] T003 [P] Create `Directory.Build.props` at the repo root:
+- [X] T001 [P] Create `LICENSE` at the repo root with the standard MIT License text and `Copyright (c) 2026 The DashCraft Authors`
+- [X] T002 Create `global.json` at the repo root pinning `"sdk": { "version": "10.0.401", "rollForward": "latestFeature" }`
+- [X] T003 [P] Create `Directory.Build.props` at the repo root:
   - `TargetFramework` net10.0, `Nullable` enable, `ImplicitUsings` enable
   - `TreatWarningsAsErrors` true, `LangVersion` latest
   - `ManagePackageVersionsCentrally` true
-- [ ] T004 [P] Create `Directory.Packages.props` at the repo root with a `PackageVersion` entry for every NuGet pin listed in "Version pins" above (Central Package Management; no versions in `.csproj` files)
-- [ ] T005 [P] Create `.config/dotnet-tools.json` with the local tool `dotnet-ef` 10.0.13 (`dotnet new tool-manifest` + `dotnet tool install dotnet-ef --version 10.0.13`)
-- [ ] T006 [P] Create `.editorconfig` at the repo root:
+- [X] T004 [P] Create `Directory.Packages.props` at the repo root with a `PackageVersion` entry for every NuGet pin listed in "Version pins" above (Central Package Management; no versions in `.csproj` files)
+- [X] T005 [P] Create `.config/dotnet-tools.json` with the local tool `dotnet-ef` 10.0.13 (`dotnet new tool-manifest` + `dotnet tool install dotnet-ef --version 10.0.13`)
+- [X] T006 [P] Create `.editorconfig` at the repo root:
   - `root = true`, UTF-8, final newline, trim trailing whitespace
   - C# 4-space indent with file-scoped namespaces preferred; TS/JSON/YAML/CSS 2-space indent
   - `dotnet_diagnostic.RMG012.severity = error` and `dotnet_diagnostic.RMG020.severity = error` (Mapperly unmapped members fail the build)
-- [ ] T007 [P] Create `.gitignore` covering:
+- [X] T007 [P] Create `.gitignore` covering:
   - .NET: `bin/`, `obj/`, `*.user`, `.vs/`, `TestResults/`
   - Node: `node_modules/`, `dist/`, `coverage/`
   - Secrets: `.env` (but NOT `.env.example`)
   - IDE folders, OS files
 
   Also create `.gitattributes` with `* text=auto eol=lf`, plus `*.ps1 eol=crlf` and `*.cmd eol=crlf`.
-- [ ] T008 Create the four backend projects in `src/api/`:
+- [X] T008 Create the four backend projects in `src/api/`:
   - `dotnet new classlib`: `DashCraft.Domain`, `DashCraft.Application`, `DashCraft.Infrastructure`
   - `dotnet new web`: `DashCraft.Api`
   - Delete template `Class1.cs` files and remove any `TargetFramework`/`Nullable`/`ImplicitUsings` already set by `Directory.Build.props`
@@ -109,19 +109,19 @@ msw, xunit v2), nor MediatR or AutoMapper.
     - `src/api/DashCraft.Domain/DomainAssembly.cs` (`public static class DomainAssembly`)
     - `src/api/DashCraft.Application/ApplicationAssembly.cs`
     - `src/api/DashCraft.Infrastructure/InfrastructureAssembly.cs`
-- [ ] T009 Add project references (dependencies point inward):
+- [X] T009 Add project references (dependencies point inward):
   - Application → Domain
   - Infrastructure → Application
   - Api → Application and Infrastructure
 
   Create `src/api/DashCraft.slnx` (`dotnet new sln --format slnx -n DashCraft`) and add all four projects.
-- [ ] T010 Create five xunit.v3 test projects under `tests/api/`:
+- [X] T010 Create five xunit.v3 test projects under `tests/api/`:
   - `DashCraft.Domain.Tests`, `DashCraft.Application.Tests`, `DashCraft.Infrastructure.Tests`, `DashCraft.Api.Tests`, `DashCraft.IntegrationTests`
   - Each references `xunit.v3`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, `Shouldly` without versions, and `OutputType` Exe as xunit.v3 requires
   - Each unit test project references its matching layer project; `DashCraft.IntegrationTests` references `DashCraft.Api` and `DashCraft.Infrastructure`
   - Add all five to `src/api/DashCraft.slnx` under a `tests` solution folder
   - Add `<Using Include="Shouldly" />` and `<Using Include="Xunit" />` in each test project
-- [ ] T011 Add NuGet package references per research.md §4 (no versions):
+- [X] T011 Add NuGet package references per research.md §4 (no versions):
   - `DashCraft.Application`: Mediator.Abstractions, FluentValidation, FluentValidation.DependencyInjectionExtensions, Riok.Mapperly
   - `DashCraft.Infrastructure`: Microsoft.EntityFrameworkCore.SqlServer, Microsoft.Extensions.Diagnostics.HealthChecks, Dapper, Microsoft.Data.SqlClient, Microsoft.SqlServer.TransactSql.ScriptDom
   - `DashCraft.Api`: Mediator.SourceGenerator (`PrivateAssets=all`, `IncludeAssets` runtime;build;native;contentfiles;analyzers), Microsoft.AspNetCore.OpenApi, Microsoft.EntityFrameworkCore.Design (`PrivateAssets=all`)
@@ -129,7 +129,7 @@ msw, xunit v2), nor MediatR or AutoMapper.
   - `DashCraft.Domain`: nothing
 
   Run `dotnet build src/api/DashCraft.slnx` and confirm 0 warnings, 0 errors.
-- [ ] T012 Create `src/web/package.json`:
+- [X] T012 Create `src/web/package.json`:
   - `name` "dashcraft-web", `private` true, `license` "MIT", `type` "module", `engines.node` ">=24.15"
   - Exact npm pins from "Version pins": runtime libraries in `dependencies`, the rest in `devDependencies`
   - Scripts:
@@ -142,28 +142,28 @@ msw, xunit v2), nor MediatR or AutoMapper.
     - `test:watch`: `vitest`
 
   Run `npm install` in `src/web` to produce `src/web/package-lock.json`.
-- [ ] T013 [P] Create the TypeScript configs in `src/web/`:
+- [X] T013 [P] Create the TypeScript configs in `src/web/`:
   - `tsconfig.json` with project references to `tsconfig.app.json` and `tsconfig.node.json`
   - `tsconfig.app.json` for `src/` and `tests/`:
     - `strict`, `noUncheckedIndexedAccess`, `noUnusedLocals`, `noUnusedParameters`, `noFallthroughCasesInSwitch`
     - `jsx` react-jsx, `moduleResolution` bundler, `target` ES2022
     - `types`: `["vite/client", "vitest/globals", "@testing-library/jest-dom"]`
   - `tsconfig.node.json` for `vite.config.ts` and `eslint.config.js`
-- [ ] T014 [P] Create `src/web/eslint.config.js` (flat config):
+- [X] T014 [P] Create `src/web/eslint.config.js` (flat config):
   - `@eslint/js` recommended, `typescript-eslint` `strictTypeChecked` with `parserOptions.projectService`
   - `eslint-plugin-react-hooks` recommended, `eslint-plugin-react-refresh` (`only-export-components` warn)
   - `@typescript-eslint/no-explicit-any: "error"`; `globals.browser`
   - Ignore `dist`, `coverage`
-- [ ] T015 [P] Create `src/web/vite.config.ts`:
+- [X] T015 [P] Create `src/web/vite.config.ts`:
   - Plugins: `@vitejs/plugin-react` and `@tailwindcss/vite`
   - `server.proxy` forwards `/health` and `/api` to `process.env.VITE_API_PROXY_TARGET ?? "http://localhost:5080"`
   - Vitest `test` block: `environment: "jsdom"`, `globals: true`, `setupFiles: ["./tests/setup.ts"]`, `include: ["src/**/*.test.{ts,tsx}", "tests/**/*.test.{ts,tsx}"]`
-- [ ] T016 [P] Create the frontend entry files:
+- [X] T016 [P] Create the frontend entry files:
   - `src/web/index.html`: title "DashCraft", `<div id="root">`, module script `/src/main.tsx`
   - `src/web/src/index.css`: `@import "tailwindcss";`
   - `src/web/tests/setup.ts`: `import "@testing-library/jest-dom/vitest";` plus `afterEach(cleanup)`
   - `src/web/src/vite-env.d.ts`: declares `VITE_API_BASE_URL?: string`
-- [ ] T017 [P] Create the frontend folder skeleton per the constitution, each with a short `README.md` stating what belongs there:
+- [X] T017 [P] Create the frontend folder skeleton per the constitution, each with a short `README.md` stating what belongs there:
   - `src/web/src/app/`, `src/web/src/routes/`, `src/web/src/features/`, `src/web/src/components/`, `src/web/src/lib/`
 
 ---
@@ -175,29 +175,29 @@ integration test harness. Every user story depends on these.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T018 [P] Create `src/api/DashCraft.Infrastructure/Persistence/DatabaseOptions.cs`:
+- [X] T018 [P] Create `src/api/DashCraft.Infrastructure/Persistence/DatabaseOptions.cs`:
   - Options class bound to section `"Database"`, with `bool ApplyMigrationsOnStartup` (default false), `int StartupMaxRetries` (default 12) and `TimeSpan StartupRetryDelay` (default 5 s)
   - Connection string name constant `public const string ConnectionStringName = "DashCraft";`
-- [ ] T019 [P] Create `src/api/DashCraft.Infrastructure/Persistence/DashCraftDbContext.cs`:
+- [X] T019 [P] Create `src/api/DashCraft.Infrastructure/Persistence/DashCraftDbContext.cs`:
   - `public sealed class DashCraftDbContext(DbContextOptions<DashCraftDbContext> options) : DbContext(options)`
   - No `DbSet`s
   - `OnModelCreating` sets `HasDefaultSchema("dbo")` and applies configurations from `InfrastructureAssembly`
-- [ ] T020 [P] Create `src/api/DashCraft.Infrastructure/Persistence/DashCraftDbContextFactory.cs`:
+- [X] T020 [P] Create `src/api/DashCraft.Infrastructure/Persistence/DashCraftDbContextFactory.cs`:
   - Implements `IDesignTimeDbContextFactory<DashCraftDbContext>` for `dotnet ef`
   - Uses `UseSqlServer` with a non-secret placeholder connection string (`Server=localhost;Database=DashCraft;Trusted_Connection=False;TrustServerCertificate=True`); generating a migration never connects
-- [ ] T021 Create `src/api/DashCraft.Infrastructure/DependencyInjection.cs` with `public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)`:
+- [X] T021 Create `src/api/DashCraft.Infrastructure/DependencyInjection.cs` with `public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)`:
   - Binds `DatabaseOptions` (`ValidateOnStart`)
   - Reads `ConnectionStrings:DashCraft`; throws a clear `InvalidOperationException` ("Connection string 'DashCraft' is not configured.") if missing, without logging it
   - Registers `DashCraftDbContext` with `UseSqlServer(cs, sql => sql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(10), errorNumbersToAdd: null))`
 
   Depends on T018, T019.
-- [ ] T022 Generate the empty baseline migration:
+- [X] T022 Generate the empty baseline migration:
   - Run `dotnet tool restore`, then `dotnet ef migrations add InitialCreate --project src/api/DashCraft.Infrastructure --startup-project src/api/DashCraft.Api --output-dir Persistence/Migrations`
   - Output lands in `src/api/DashCraft.Infrastructure/Persistence/Migrations/`
   - Verify `Up`/`Down` are empty and a model snapshot exists
 
   Depends on T019, T020.
-- [ ] T023 Create the background migration runner so the API serves `/health` (as 503) while it waits for the database (spec edge case "Database not yet ready at startup"):
+- [X] T023 Create the background migration runner so the API serves `/health` (as 503) while it waits for the database (spec edge case "Database not yet ready at startup"):
   - **`src/api/DashCraft.Infrastructure/Persistence/DatabaseReadiness.cs`**: singleton `public sealed class DatabaseReadiness` with `bool IsReady` (thread-safe via `Volatile`), `MarkReady()`, and constructor logic setting it ready immediately when `ApplyMigrationsOnStartup` is false
   - **`src/api/DashCraft.Infrastructure/Persistence/MigrationHostedService.cs`**: `internal sealed class MigrationHostedService : BackgroundService`
     - `ExecuteAsync` starts with `await Task.Yield()` so it never blocks host startup or Kestrel
@@ -209,32 +209,32 @@ integration test harness. Every user story depends on these.
   - Register both in `AddInfrastructure` (`AddSingleton<DatabaseReadiness>()`, `AddHostedService<MigrationHostedService>()`)
 
   Depends on T018, T021.
-- [ ] T024 [P] Create `tests/api/DashCraft.Infrastructure.Tests/Persistence/DatabaseReadinessTests.cs`:
+- [X] T024 [P] Create `tests/api/DashCraft.Infrastructure.Tests/Persistence/DatabaseReadinessTests.cs`:
   - With `ApplyMigrationsOnStartup=false`, `IsReady` is true immediately
   - With it true, `IsReady` is false until `MarkReady()` is called
-- [ ] T025 [P] Create `tests/api/DashCraft.Application.Tests/Common/Behaviors/ValidationBehaviorTests.cs` (write before T026 and confirm it fails). Define a test-only `sealed record PingCommand(string Name) : ICommand<string>` and an inline `AbstractValidator<PingCommand>` requiring `Name` non-empty, then call `ValidationBehavior.Handle` with a `next` delegate that records invocation:
+- [X] T025 [P] Create `tests/api/DashCraft.Application.Tests/Common/Behaviors/ValidationBehaviorTests.cs` (write before T026 and confirm it fails). Define a test-only `sealed record PingCommand(string Name) : ICommand<string>` and an inline `AbstractValidator<PingCommand>` requiring `Name` non-empty, then call `ValidationBehavior.Handle` with a `next` delegate that records invocation:
   - Invalid input throws `ValidationException` containing the `Name` failure, and `next` is not called
   - Valid input returns `next`'s result
   - No validators means `next` is called
-- [ ] T026 [P] Create `src/api/DashCraft.Application/Common/Behaviors/ValidationBehavior.cs`:
+- [X] T026 [P] Create `src/api/DashCraft.Application/Common/Behaviors/ValidationBehavior.cs`:
   - `public sealed class ValidationBehavior<TMessage, TResponse>(IEnumerable<IValidator<TMessage>> validators) : IPipelineBehavior<TMessage, TResponse> where TMessage : notnull, IMessage`
   - Runs all validators with the cancellation token; if any failures, throws `FluentValidation.ValidationException` with all failures; otherwise calls `next`
-- [ ] T027 Create `src/api/DashCraft.Application/DependencyInjection.cs` with `public static IServiceCollection AddApplication(this IServiceCollection services)`:
+- [X] T027 Create `src/api/DashCraft.Application/DependencyInjection.cs` with `public static IServiceCollection AddApplication(this IServiceCollection services)`:
   - Registers validators via `AddValidatorsFromAssembly(typeof(ApplicationAssembly).Assembly, includeInternalTypes: true)`
   - Does NOT call `AddMediator` (the source generator lives in Api)
 
   Depends on T026.
-- [ ] T028 [P] Create `tests/api/DashCraft.Api.Tests/ErrorHandling/ValidationExceptionHandlerTests.cs` (write before T029 and confirm it fails):
+- [X] T028 [P] Create `tests/api/DashCraft.Api.Tests/ErrorHandling/ValidationExceptionHandlerTests.cs` (write before T029 and confirm it fails):
   - Build a minimal service provider with `AddProblemDetails()` and a `DefaultHttpContext`
   - Assert that handling a `ValidationException` with two failures on `Name` writes status 400 and a ProblemDetails body whose `errors.Name` has both messages
   - Assert that a non-validation exception returns `false` (not handled)
-- [ ] T029 [P] Create `src/api/DashCraft.Api/ErrorHandling/ValidationExceptionHandler.cs`:
+- [X] T029 [P] Create `src/api/DashCraft.Api/ErrorHandling/ValidationExceptionHandler.cs`:
   - `IExceptionHandler` that handles `FluentValidation.ValidationException`
   - Writes a 400 ProblemDetails (`title` "One or more validation errors occurred.") with an `errors` dictionary grouped by property name, via `IProblemDetailsService`
-- [ ] T030 [P] Create `src/api/DashCraft.Api/ErrorHandling/UnhandledExceptionHandler.cs`:
+- [X] T030 [P] Create `src/api/DashCraft.Api/ErrorHandling/UnhandledExceptionHandler.cs`:
   - `IExceptionHandler` that logs the exception at Error and writes a 500 ProblemDetails with `title` "Something went wrong on our side. Please try again."
   - Includes `detail` (exception message) only when `IHostEnvironment.IsDevelopment()`; always includes `traceId`
-- [ ] T031 Create `src/api/DashCraft.Api/Program.cs`:
+- [X] T031 Create `src/api/DashCraft.Api/Program.cs`:
   - **Services**:
     - `AddProblemDetails()`; register the exception handlers (validation first)
     - `AddOpenApi()`
@@ -246,7 +246,7 @@ integration test harness. Every user story depends on these.
   - Keep the template's `MapGet("/")` out
 
   Depends on T021, T023, T027, T029, T030.
-- [ ] T032 [P] Create `src/api/DashCraft.Api/appsettings.json` and `src/api/DashCraft.Api/appsettings.Development.json`:
+- [X] T032 [P] Create `src/api/DashCraft.Api/appsettings.json` and `src/api/DashCraft.Api/appsettings.Development.json`:
   - **`appsettings.json`**:
     - Logging levels (Default Information, Microsoft.AspNetCore Warning, Microsoft.EntityFrameworkCore.Database.Command Warning)
     - `"Database": { "ApplyMigrationsOnStartup": false }`
@@ -257,27 +257,27 @@ integration test harness. Every user story depends on these.
     - `Database:ApplyMigrationsOnStartup` true
 
   The password is the documented development-only default, the same as compose. Also update `Properties/launchSettings.json` to use `http://localhost:5080` only.
-- [ ] T033 [P] Create `tests/api/DashCraft.IntegrationTests/Infrastructure/SqlServerFixture.cs`:
+- [X] T033 [P] Create `tests/api/DashCraft.IntegrationTests/Infrastructure/SqlServerFixture.cs`:
   - xunit.v3 assembly fixture (`[assembly: AssemblyFixture(typeof(SqlServerFixture))]`) implementing `IAsyncLifetime`
   - Starts `new MsSqlBuilder("mcr.microsoft.com/mssql/server:2025-CU10-ubuntu-24.04").Build()` and exposes `ConnectionString` (with `Database=DashCraft` set via `SqlConnectionStringBuilder`)
   - If Docker is unavailable, catch the Testcontainers exception and throw `InvalidOperationException("Integration tests need a running Docker engine. Start Docker Desktop and try again.", inner)`
-- [ ] T034 Create `tests/api/DashCraft.IntegrationTests/Infrastructure/DashCraftApiFactory.cs`:
+- [X] T034 Create `tests/api/DashCraft.IntegrationTests/Infrastructure/DashCraftApiFactory.cs`:
   - `WebApplicationFactory<Program>` taking a connection string plus optional `applyMigrations` (default true) and `startupMaxRetries` (default 1)
   - Sets environment "Testing"; uses `ConfigureAppConfiguration` to add in-memory `ConnectionStrings:DashCraft`, `Database:ApplyMigrationsOnStartup`, `Database:StartupMaxRetries`, `Database:StartupRetryDelay=00:00:01`
   - Exposes `CreateClient()` and `Task<HttpResponseMessage> WaitUntilHealthyAsync(TimeSpan timeout)`, which polls `GET /health` every 500 ms until 200 and fails with the last body if the timeout (default 60 s) passes. Migrations now run in the background, so tests must not assume readiness immediately after startup.
 
   Depends on T031, T033.
-- [ ] T035 [P] Create `src/web/src/lib/apiClient.ts`:
+- [X] T035 [P] Create `src/web/src/lib/apiClient.ts`:
   - `export class ApiError extends Error` with `status: number` and an optional `problem` (parsed ProblemDetails)
   - `export async function apiGet<T>(path: string, schema: z.ZodType<T>, options?: { signal?: AbortSignal; acceptStatuses?: number[] }): Promise<T>`:
     - Prefixes `import.meta.env.VITE_API_BASE_URL ?? ""`, sends `Accept: application/json`
     - Treats `response.ok` or any status in `acceptStatuses` as success and parses the JSON with `schema.parse`
     - Otherwise throws `ApiError`
   - Network errors propagate as `TypeError`; no `any`
-- [ ] T036 [P] Create `src/web/src/app/providers.tsx`:
+- [X] T036 [P] Create `src/web/src/app/providers.tsx`:
   - `AppProviders({ children })` creating one `QueryClient` (defaults: `retry: 1`, `refetchOnWindowFocus: false`) inside `useState`, wrapping children in `QueryClientProvider`
   - Also export `createTestQueryClient()` (`retry: false`) from `src/web/src/app/queryClient.ts` for tests
-- [ ] T037 Create `src/web/src/routes/router.tsx`, `src/web/src/app/App.tsx`, and `src/web/src/main.tsx`:
+- [X] T037 Create `src/web/src/routes/router.tsx`, `src/web/src/app/App.tsx`, and `src/web/src/main.tsx`:
   - `router.tsx` exports `routes: RouteObject[]` (central route table, initially `[]`) and `createAppRouter()` using `createBrowserRouter(routes)`
   - `App.tsx` renders `<AppProviders><RouterProvider router={...} /></AppProviders>`
   - `main.tsx` imports `./index.css` and renders `<StrictMode><App /></StrictMode>` into `#root`
@@ -302,15 +302,15 @@ page shows the API status.
 
 ### Tests for User Story 1 (write first, confirm they fail) ⚠️
 
-- [ ] T038 [P] [US1] Create `tests/api/DashCraft.Api.Tests/Health/HealthResponseWriterTests.cs`. Using a `DefaultHttpContext` with a `MemoryStream` body and hand-built `HealthReport`s, assert:
+- [X] T038 [P] [US1] Create `tests/api/DashCraft.Api.Tests/Health/HealthResponseWriterTests.cs`. Using a `DefaultHttpContext` with a `MemoryStream` body and hand-built `HealthReport`s, assert:
   - Content type is `application/json; charset=utf-8`
   - JSON has exactly `status`, `totalDurationMs`, `checks`, with camelCase names and string enum values `Healthy`/`Degraded`/`Unhealthy`
   - Each check has `name`, `status`, `durationMs`, and `description` only when present
   - An Unhealthy `database` entry whose exception message contains "Login failed for user 'sa'" and "Server=secret-host" is rendered with `description` = `"The application database is not reachable."`, and the body contains neither "Login failed" nor "secret-host"
 
   This is the no-leak test required by constitution Principle II, Health endpoint exception.
-- [ ] T039 [P] [US1] Create `tests/api/DashCraft.Infrastructure.Tests/Health/DatabaseHealthCheckTests.cs`. With a `DatabaseReadiness` that is not ready and a `DashCraftDbContext` built with `UseSqlServer("Server=unused;Database=DashCraft")`, `CheckHealthAsync` returns `Unhealthy` without attempting a connection (it completes in under 1 s)
-- [ ] T040 [P] [US1] Create `tests/api/DashCraft.Infrastructure.Tests/Persistence/DashCraftDbContextTests.cs`. Build `DashCraftDbContext` with `UseSqlServer("Server=unused;Database=DashCraft")` (no connection is opened) and assert:
+- [X] T039 [P] [US1] Create `tests/api/DashCraft.Infrastructure.Tests/Health/DatabaseHealthCheckTests.cs`. With a `DatabaseReadiness` that is not ready and a `DashCraftDbContext` built with `UseSqlServer("Server=unused;Database=DashCraft")`, `CheckHealthAsync` returns `Unhealthy` without attempting a connection (it completes in under 1 s)
+- [X] T040 [P] [US1] Create `tests/api/DashCraft.Infrastructure.Tests/Persistence/DashCraftDbContextTests.cs`. Build `DashCraftDbContext` with `UseSqlServer("Server=unused;Database=DashCraft")` (no connection is opened) and assert:
   - `context.Model` builds with default schema `dbo`
   - `context.Database.GetMigrations()` contains exactly one migration ending in `_InitialCreate`
 - [ ] T041 [P] [US1] Create `tests/api/DashCraft.IntegrationTests/Health/HealthEndpointTests.cs`, using `SqlServerFixture` + `DashCraftApiFactory`:
@@ -320,13 +320,13 @@ page shows the API status.
 - [ ] T042 [P] [US1] Create `tests/api/DashCraft.IntegrationTests/Persistence/MigrationTests.cs`:
   - After `WaitUntilHealthyAsync`, `SELECT MigrationId FROM dbo.__EFMigrationsHistory` (via `Microsoft.Data.SqlClient`) returns one row ending in `_InitialCreate`
   - Starting a second factory against the same database succeeds and still yields exactly one row (idempotent, FR-006)
-- [ ] T043 [P] [US1] Create `tests/api/DashCraft.IntegrationTests/Health/DatabaseUnavailableTests.cs`. Use a `DashCraftApiFactory` with connection string `Server=127.0.0.1,1;Database=DashCraft;User Id=sa;Password=x;Connect Timeout=2;TrustServerCertificate=True` and `ApplyMigrationsOnStartup=false`. No container is needed. Assert:
+- [X] T043 [P] [US1] Create `tests/api/DashCraft.IntegrationTests/Health/DatabaseUnavailableTests.cs`. Use a `DashCraftApiFactory` with connection string `Server=127.0.0.1,1;Database=DashCraft;User Id=sa;Password=x;Connect Timeout=2;TrustServerCertificate=True` and `ApplyMigrationsOnStartup=false`. No container is needed. Assert:
   - `GET /health` returns 503 with `status == "Unhealthy"` and a `database` check that is `Unhealthy` with description `"The application database is not reachable."`
   - The body does not contain "127.0.0.1", "Password", or "Exception" (FR-005, no leaked details)
-- [ ] T044 [P] [US1] Create `tests/api/DashCraft.IntegrationTests/Health/StartupAvailabilityTests.cs` (spec edge case "Database not yet ready at startup"). Use a `DashCraftApiFactory` with the same unreachable connection string as T043, `applyMigrations: true`, and `startupMaxRetries: 30`. No container is needed. Assert:
+- [X] T044 [P] [US1] Create `tests/api/DashCraft.IntegrationTests/Health/StartupAvailabilityTests.cs` (spec edge case "Database not yet ready at startup"). Use a `DashCraftApiFactory` with the same unreachable connection string as T043, `applyMigrations: true`, and `startupMaxRetries: 30`. No container is needed. Assert:
   - While migrations are still retrying, `GET /health` responds (no connection error) with 503 and a `database` check that is `Unhealthy`
   - The host has not stopped
-- [ ] T045 [P] [US1] Create `src/web/src/features/home/components/HomePage.test.tsx`. Render `HomePage` inside `QueryClientProvider` (from `createTestQueryClient()`) and `MemoryRouter`, stubbing `fetch` with `vi.stubGlobal`:
+- [X] T045 [P] [US1] Create `src/web/src/features/home/components/HomePage.test.tsx`. Render `HomePage` inside `QueryClientProvider` (from `createTestQueryClient()`) and `MemoryRouter`, stubbing `fetch` with `vi.stubGlobal`:
   - **Healthy**: a 200 healthy body shows heading "DashCraft" and text "API: Healthy"
   - **Unhealthy**: a 503 body with database Unhealthy shows "API: Unhealthy" and "The application database is not reachable."
   - **Unreachable**: `fetch` rejects with `TypeError`, so the page shows "We can't reach the DashCraft API right now. Check that it is running." and the page still renders its heading
@@ -334,52 +334,52 @@ page shows the API status.
 
 ### Implementation for User Story 1
 
-- [ ] T046 [US1] Create `src/api/DashCraft.Infrastructure/Health/DatabaseHealthCheck.cs` (`internal sealed class DatabaseHealthCheck(DashCraftDbContext db, DatabaseReadiness readiness) : IHealthCheck`):
+- [X] T046 [US1] Create `src/api/DashCraft.Infrastructure/Health/DatabaseHealthCheck.cs` (`internal sealed class DatabaseHealthCheck(DashCraftDbContext db, DatabaseReadiness readiness) : IHealthCheck`):
   - Returns `Unhealthy` without touching the database when `!readiness.IsReady`
   - Otherwise returns `Healthy` if `await db.Database.CanConnectAsync(ct)`, else `Unhealthy`
   - Catches exceptions and returns `Unhealthy` (the writer never exposes the exception)
 
   Register it in `AddInfrastructure` in `src/api/DashCraft.Infrastructure/DependencyInjection.cs` with `services.AddHealthChecks().AddCheck<DatabaseHealthCheck>("database", failureStatus: HealthStatus.Unhealthy, tags: ["db"], timeout: TimeSpan.FromSeconds(5))`. Makes T039 pass.
-- [ ] T047 [US1] Create `src/api/DashCraft.Api/Health/HealthResponseWriter.cs`: `public static class HealthResponseWriter` with `public static Task WriteAsync(HttpContext context, HealthReport report)` writing the JSON contract with `System.Text.Json` (camelCase, string enums):
+- [X] T047 [US1] Create `src/api/DashCraft.Api/Health/HealthResponseWriter.cs`: `public static class HealthResponseWriter` with `public static Task WriteAsync(HttpContext context, HealthReport report)` writing the JSON contract with `System.Text.Json` (camelCase, string enums):
   - `durationMs` and `totalDurationMs` rounded to 1 decimal
   - `description` for a non-Healthy entry comes from a fixed map (`"database"` → `"The application database is not reachable."`, otherwise `"This dependency is not available."`); never use `entry.Description` or `entry.Exception`
 
   Makes T038 pass.
-- [ ] T048 [US1] Create `src/api/DashCraft.Api/Endpoints/HealthEndpoints.cs` with `public static IEndpointRouteBuilder MapHealthEndpoints(this IEndpointRouteBuilder app)`:
+- [X] T048 [US1] Create `src/api/DashCraft.Api/Endpoints/HealthEndpoints.cs` with `public static IEndpointRouteBuilder MapHealthEndpoints(this IEndpointRouteBuilder app)`:
   - Maps `app.MapHealthChecks("/health", new HealthCheckOptions { ResponseWriter = HealthResponseWriter.WriteAsync, ResultStatusCodes = { [Healthy] = 200, [Degraded] = 200, [Unhealthy] = 503 } })`
   - Adds `.AllowAnonymous()` with the comment `// Anonymous per constitution Principle II, Health endpoint exception (no-leak test: HealthResponseWriterTests).`
 
   Call `app.MapHealthEndpoints()` from `src/api/DashCraft.Api/Program.cs`. Makes T041 to T043 and T044 pass.
-- [ ] T049 [P] [US1] Create `src/web/src/features/health/schemas/health.ts` with Zod schemas mirroring data-model.md and export inferred types via `z.infer`:
+- [X] T049 [P] [US1] Create `src/web/src/features/health/schemas/health.ts` with Zod schemas mirroring data-model.md and export inferred types via `z.infer`:
   - `healthStatusSchema = z.enum(["Healthy", "Degraded", "Unhealthy"])`
   - `healthCheckResultSchema` (`name: z.string()`, `status`, `description: z.string().optional()`, `durationMs: z.number().nonnegative()`)
   - `healthReportSchema` (`status`, `totalDurationMs: z.number().nonnegative()`, `checks: z.array(healthCheckResultSchema)`)
-- [ ] T050 [US1] Create the health API layer:
+- [X] T050 [US1] Create the health API layer:
   - `src/web/src/features/health/api/getHealth.ts`: `getHealth(signal)` returns `apiGet("/health", healthReportSchema, { signal, acceptStatuses: [503] })`
   - `src/web/src/features/health/api/useHealth.ts`: `useHealth()` returns `useQuery({ queryKey: ["health"], queryFn: ({ signal }) => getHealth(signal), refetchInterval: 10_000 })`
 
   Depends on T035, T049.
-- [ ] T051 [P] [US1] Create `src/web/src/components/StatusBadge.tsx`:
+- [X] T051 [P] [US1] Create `src/web/src/components/StatusBadge.tsx`:
   - Shared primitive `StatusBadge({ tone: "success" | "warning" | "danger" | "neutral", children })`
   - Tailwind pill with text plus color (never color alone), and `aria-hidden` dot
-- [ ] T052 [US1] Create `src/web/src/features/health/components/HealthStatus.tsx`:
+- [X] T052 [US1] Create `src/web/src/features/health/components/HealthStatus.tsx`:
   - Uses `useHealth()` inside a `role="status" aria-live="polite"` region
   - Loading: "Checking API status…"
   - Success: `StatusBadge` "API: {status}" (Healthy→success, Degraded→warning, Unhealthy→danger) and a list of non-Healthy checks with their `description`
   - Error (network, `ApiError`, or `ZodError`): "We can't reach the DashCraft API right now. Check that it is running."
 
   Depends on T050, T051.
-- [ ] T053 [US1] Create `src/web/src/features/home/components/HomePage.tsx`: responsive centered Tailwind layout with `<h1>DashCraft</h1>`, the one-line description "Build dashboards from your SQL Server data without writing SQL.", and `<HealthStatus />`. Makes T045 pass.
-- [ ] T054 [US1] Create the routes and register them in `routes` in `src/web/src/routes/router.tsx`:
+- [X] T053 [US1] Create `src/web/src/features/home/components/HomePage.tsx`: responsive centered Tailwind layout with `<h1>DashCraft</h1>`, the one-line description "Build dashboards from your SQL Server data without writing SQL.", and `<HealthStatus />`. Makes T045 pass.
+- [X] T054 [US1] Create the routes and register them in `routes` in `src/web/src/routes/router.tsx`:
   - `src/web/src/routes/HomeRoute.tsx` (thin, renders `HomePage`)
   - `src/web/src/routes/NotFoundRoute.tsx` ("Page not found" + link home)
   - Routes: `{ path: "/", element: <HomeRoute /> }` and `{ path: "*", element: <NotFoundRoute /> }`
-- [ ] T055 [P] [US1] Create `src/api/Dockerfile` (build context = repo root), multi-stage:
+- [X] T055 [P] [US1] Create `src/api/Dockerfile` (build context = repo root), multi-stage:
   - **Build stage**: `mcr.microsoft.com/dotnet/sdk:10.0` with `ENV DOTNET_CLI_TELEMETRY_OPTOUT=1` (FR-015); copy `global.json`, `Directory.Build.props`, `Directory.Packages.props`, `.editorconfig`, then the 4 `src/api/DashCraft.*/*.csproj`; `dotnet restore src/api/DashCraft.Api/DashCraft.Api.csproj`; copy `src/api/`; `dotnet publish src/api/DashCraft.Api -c Release -o /app --no-restore`
   - **Runtime stage**: `mcr.microsoft.com/dotnet/aspnet:10.0` with `ENV ASPNETCORE_HTTP_PORTS=8080`, `EXPOSE 8080`, `USER app`, `ENTRYPOINT ["dotnet","DashCraft.Api.dll"]`
 
   Add a root `.dockerignore` excluding `**/bin`, `**/obj`, `**/node_modules`, `**/dist`, `.git`, `.env`, `tests/`, `specs/`.
-- [ ] T056 [P] [US1] Create `src/web/Dockerfile`, `src/web/nginx.conf`, and `src/web/.dockerignore` (build context = `src/web`):
+- [X] T056 [P] [US1] Create `src/web/Dockerfile`, `src/web/nginx.conf`, and `src/web/.dockerignore` (build context = `src/web`):
   - **Dockerfile**:
     - Build stage `node:24.22.1-alpine`: `npm ci`, `npm run build`
     - Runtime stage `nginx:1.30.6-alpine`: copy `dist` to `/usr/share/nginx/html` and `nginx.conf` to `/etc/nginx/conf.d/default.conf`; `EXPOSE 8080`
@@ -388,7 +388,7 @@ page shows the API status.
     - `location /health` and `location /api/` → `proxy_pass http://api:8080` with `proxy_set_header Host`/`X-Forwarded-*`
     - `location /` → `try_files $uri /index.html`
   - **.dockerignore**: `node_modules`, `dist`, `coverage`
-- [ ] T057 [US1] Create `docker-compose.yml` at the repo root (project `name: dashcraft`):
+- [X] T057 [US1] Create `docker-compose.yml` at the repo root (project `name: dashcraft`):
   - **`sqlserver`**:
     - Image `mcr.microsoft.com/mssql/server:2025-CU10-ubuntu-24.04`
     - Env: `ACCEPT_EULA: "Y"`, `MSSQL_PID: Developer`, `MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-DashCraft_Dev_Passw0rd!}`
@@ -404,7 +404,7 @@ page shows the API status.
     - Ports `${API_PORT:-5080}:8080`; `depends_on: sqlserver: condition: service_healthy`; `restart: unless-stopped`
   - **`web`**: build `src/web`; ports `${WEB_PORT:-8080}:8080`; `depends_on: [api]`; `restart: unless-stopped`
   - Top-level `volumes: dashcraft-sqldata: {}`
-- [ ] T058 [P] [US1] Create `.env.example` at the repo root, with a header comment "Copy to .env. Development defaults only; change MSSQL_SA_PASSWORD for any shared or production use. SQL Server requires 8+ chars with upper, lower, digit and symbol.":
+- [X] T058 [P] [US1] Create `.env.example` at the repo root, with a header comment "Copy to .env. Development defaults only; change MSSQL_SA_PASSWORD for any shared or production use. SQL Server requires 8+ chars with upper, lower, digit and symbol.":
   - `MSSQL_SA_PASSWORD=DashCraft_Dev_Passw0rd!`
   - `SQL_PORT=14330`, `API_PORT=5080`, `WEB_PORT=8080`
   - `ASPNETCORE_ENVIRONMENT=Production`
@@ -429,17 +429,17 @@ assertion and confirm a non-zero exit.
 
 ### Tests for User Story 2
 
-- [ ] T060 [P] [US2] Create `tests/api/DashCraft.Domain.Tests/ArchitectureTests.cs`: `typeof(DomainAssembly).Assembly.GetReferencedAssemblies()` contains no name starting with `"DashCraft."` (constitution: Domain has no dependencies on other layers)
-- [ ] T061 [P] [US2] Create `tests/api/DashCraft.Application.Tests/ArchitectureTests.cs`: the Application assembly references `DashCraft.Domain` but not `DashCraft.Infrastructure` or `DashCraft.Api`, and does not reference `Microsoft.EntityFrameworkCore` or `Dapper`
-- [ ] T062 [P] [US2] Create `tests/api/DashCraft.Infrastructure.Tests/ArchitectureTests.cs`: the Infrastructure assembly does not reference `DashCraft.Api` or `Microsoft.AspNetCore.Mvc*`
+- [X] T060 [P] [US2] Create `tests/api/DashCraft.Domain.Tests/ArchitectureTests.cs`: `typeof(DomainAssembly).Assembly.GetReferencedAssemblies()` contains no name starting with `"DashCraft."` (constitution: Domain has no dependencies on other layers)
+- [X] T061 [P] [US2] Create `tests/api/DashCraft.Application.Tests/ArchitectureTests.cs`: the Application assembly references `DashCraft.Domain` but not `DashCraft.Infrastructure` or `DashCraft.Api`, and does not reference `Microsoft.EntityFrameworkCore` or `Dapper`
+- [X] T062 [P] [US2] Create `tests/api/DashCraft.Infrastructure.Tests/ArchitectureTests.cs`: the Infrastructure assembly does not reference `DashCraft.Api` or `Microsoft.AspNetCore.Mvc*`
 
 ### Implementation for User Story 2
 
-- [ ] T063 [US2] Make the unit test command exclude integration tests: verify `dotnet test src/api/DashCraft.slnx --filter "FullyQualifiedName!~DashCraft.IntegrationTests"` runs all four unit test projects with Docker stopped. If xunit.v3 + VSTest filtering misbehaves, add `src/api/DashCraft.Unit.slnf` (solution filter listing the 4 layer projects and 4 unit test projects) and use `dotnet test src/api/DashCraft.Unit.slnf` instead; update quickstart.md Scenario 4 to match.
-- [ ] T064 [US2] Confirm failure propagation (FR-013):
+- [X] T063 [US2] Make the unit test command exclude integration tests: verify `dotnet test src/api/DashCraft.slnx --filter "FullyQualifiedName!~DashCraft.IntegrationTests"` runs all four unit test projects with Docker stopped. If xunit.v3 + VSTest filtering misbehaves, add `src/api/DashCraft.Unit.slnf` (solution filter listing the 4 layer projects and 4 unit test projects) and use `dotnet test src/api/DashCraft.Unit.slnf` instead; update quickstart.md Scenario 4 to match.
+- [X] T064 [US2] Confirm failure propagation (FR-013):
   - Temporarily break one assertion in each suite (backend unit, integration, frontend) and confirm `dotnet test` / `npm test` exit non-zero, then revert
   - Confirm that with Docker stopped the integration run fails fast with the T033 message rather than hanging
-- [ ] T065 [US2] Create `.github/workflows/ci.yml` (name `CI`, on `push` to `master` and `pull_request`; `permissions: contents: read`; `concurrency` cancels superseded runs; workflow-level `env: DOTNET_CLI_TELEMETRY_OPTOUT: "1"`, `DOTNET_NOLOGO: "1"`):
+- [X] T065 [US2] Create `.github/workflows/ci.yml` (name `CI`, on `push` to `master` and `pull_request`; `permissions: contents: read`; `concurrency` cancels superseded runs; workflow-level `env: DOTNET_CLI_TELEMETRY_OPTOUT: "1"`, `DOTNET_NOLOGO: "1"`):
   - **`backend`** (ubuntu-latest):
     - `actions/checkout@v7`, `actions/setup-dotnet@v6` with `global-json-file: global.json`
     - `dotnet restore src/api/DashCraft.slnx`
@@ -468,7 +468,7 @@ test code live.
 
 ### Implementation for User Story 3
 
-- [ ] T066 [US3] Write `README.md` at the repo root with these sections (FR-014):
+- [X] T066 [US3] Write `README.md` at the repo root with these sections (FR-014):
   1. **What is DashCraft**: one paragraph, plus a note that the project is early-stage.
   2. **Prerequisites**: Docker Desktop or another engine with Compose v2+; .NET SDK 10.0.401+; Node.js 24 LTS (>= 24.15); Git.
   3. **Quick start**: clone, optional `cp .env.example .env`, `docker compose up -d --build`, and the URLs: web <http://localhost:8080>, health <http://localhost:5080/health>, OpenAPI `/openapi/v1.json` (Development only).
@@ -481,7 +481,7 @@ test code live.
   10. **Troubleshooting**: port in use; Docker not running; SQL Server password complexity; health 503 means the database is unreachable or migrations are still running at startup.
   11. **Contributing and CI**: what the `CI` workflow runs, and the one-time maintainer step of enabling branch protection on `master` requiring the `backend`, `frontend`, and `docker` checks.
   12. **License**: MIT (see `LICENSE`); third-party licenses verified in `specs/001-project-foundation/research.md`; the SQL Server container image runs under Microsoft's EULA (Developer edition is for development and testing only).
-- [ ] T067 [P] [US3] Cross-check documentation consistency:
+- [X] T067 [P] [US3] Cross-check documentation consistency:
   - Ports, commands, and paths in `README.md` match `docker-compose.yml`, `.env.example`, `src/web/vite.config.ts`, `launchSettings.json`, and `specs/001-project-foundation/quickstart.md`
   - Fix any mismatch in the file that is wrong
 - [ ] T068 [US3] Do a README walkthrough (quickstart.md Scenario 5) from a clean clone in a temp directory: `git clone` the local repo, follow `README.md` verbatim, and note and fix every step that needs knowledge not written in the README
@@ -515,7 +515,7 @@ test code live.
   - `docker compose build`
   - Record the results
 - [ ] T072 Run every scenario in `specs/001-project-foundation/quickstart.md` (1 to 6; for 6, validate the workflow syntax locally, e.g. `actionlint` if available, or note that it must be confirmed on first push), and confirm SC-001 to SC-006
-- [ ] T073 If any pinned version or design decision changed during implementation, update `specs/001-project-foundation/research.md` and `specs/001-project-foundation/plan.md` to match the delivered state
+- [X] T073 If any pinned version or design decision changed during implementation, update `specs/001-project-foundation/research.md` and `specs/001-project-foundation/plan.md` to match the delivered state
 
 ---
 

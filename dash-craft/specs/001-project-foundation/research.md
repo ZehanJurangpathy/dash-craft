@@ -25,8 +25,10 @@ registries on 2026-10-25. "Latest stable" means the newest version without a pre
 | FluentValidation.DependencyInjectionExtensions | 12.2.0 | Apache-2.0 | net8.0 asset | ✅ |
 | Microsoft.AspNetCore.OpenApi | 10.0.13 | MIT | net10.0 | ✅ |
 | xunit.v3 | 4.0.2 | Apache-2.0 | net8.0 asset | ✅ |
-| xunit.runner.visualstudio | 4.0.1 | Apache-2.0 | test adapter | ✅ |
-| Microsoft.NET.Test.Sdk | 18.11.0 | MIT | test host | ✅ |
+| ~~xunit.runner.visualstudio~~ | removed during implementation | Apache-2.0 | VSTest adapter; not used under Microsoft.Testing.Platform (§9) | n/a |
+| ~~Microsoft.NET.Test.Sdk~~ | removed during implementation | MIT | VSTest host; not used under Microsoft.Testing.Platform (§9) | n/a |
+| Microsoft.Extensions.Options.ConfigurationExtensions | 10.0.13 (added during implementation) | MIT | net10.0; needed to bind `DatabaseOptions` in Infrastructure | ✅ |
+| System.Security.Cryptography.Pkcs | 10.0.13 (transitive pin, added during implementation) | MIT | net10.0; see §1.3 | ✅ |
 | Shouldly | 4.3.0 | BSD-3-Clause | net9.0 asset | ✅ |
 | Microsoft.AspNetCore.Mvc.Testing | 10.0.13 | MIT | net10.0 | ✅ |
 | Testcontainers.MsSql | 4.16.0 | MIT | net10.0 asset | ✅ |
@@ -47,7 +49,7 @@ Local SDK found: .NET SDK **10.0.401**.
 | tailwindcss / @tailwindcss/vite | 4.3.3 | MIT | peer vite ^8 supported | ✅ |
 | react-hook-form | 7.91.0 | MIT | Installed, first used by a later feature | ✅ |
 | zod | 4.6.7 | MIT | | ✅ |
-| @hookform/resolvers | 6.0.0 | MIT | peer zod ^4, react-hook-form ^7.55 | ✅ |
+| @hookform/resolvers | **5.9.2** (latest is 6.0.0, see §1.3) | MIT | peer react-hook-form ^7.55; supports zod 4 | ✅ |
 | vitest | 5.0.5 | MIT | Node ^22.12 or ^24 | ✅ |
 | jsdom | 30.1.3 | MIT | Node ^22.22.2 or ^24.15 | ✅ |
 | @testing-library/react | 16.3.3 | MIT | | ✅ |
@@ -84,6 +86,21 @@ permissive and compatible with distributing DashCraft under MIT. Specific checks
 - MediatR and AutoMapper (commercially licensed in recent versions) are **not** used.
 - FluentValidation 12 remains Apache-2.0.
 - ScriptDom is MIT, as the constitution expected.
+
+### 1.5 Changes made during implementation (2026-10-25)
+
+- **System.Security.Cryptography.Pkcs pinned to 10.0.13 (transitive).** Microsoft.Data.SqlClient
+  6.1.7 depends on Pkcs 9.0.11, which has advisories GHSA-2fmv-rv2c-59x7 (moderate) and
+  GHSA-846f-f764-76mx (high). NuGet's audit failed the build (warnings are errors).
+  `Directory.Packages.props` enables `CentralPackageTransitivePinningEnabled` and pins the
+  patched 10.0.13. Remove the pin when SqlClient ships with a patched dependency.
+- **@hookform/resolvers 5.9.2 instead of 6.0.0.** 6.0.0 (released 2026-10-19) declares
+  conflicting optional peer dependencies (`effect@^4` directly, `effect@^3` through its own
+  `@typeschema` chain), so `npm install` fails without `--legacy-peer-deps`. 5.9.2 peers only
+  on react-hook-form and supports Zod 4. Revisit when 6.x fixes its peers.
+- **Microsoft.Extensions.Options.ConfigurationExtensions 10.0.13 added** to Infrastructure for
+  `AddOptions<T>().Bind(...)`.
+- **VSTest replaced by Microsoft.Testing.Platform** (see §9).
 
 ## 2. Packages considered and NOT added
 
@@ -124,7 +141,7 @@ permissive and compatible with distributing DashCraft under MIT. Specific checks
   it becomes its own project is decided by the first query feature, not here.
 - **Api**: Mediator.SourceGenerator (the generator must run in the composing host project),
   Microsoft.AspNetCore.OpenApi, EF Core Design (`PrivateAssets=all`, for migrations tooling).
-- **Tests**: xunit.v3, xunit.runner.visualstudio, Microsoft.NET.Test.Sdk, Shouldly; the
+- **Tests**: xunit.v3 and Shouldly (Microsoft.Testing.Platform runner, §9); the
   integration project adds Microsoft.AspNetCore.Mvc.Testing and Testcontainers.MsSql.
 
 ## 5. Health check design
@@ -203,21 +220,33 @@ permissive and compatible with distributing DashCraft under MIT. Specific checks
   each with at least one meaningful sample test (for example, the health response writer maps
   statuses correctly, or the DbContext model builds).
 - **Integration tests**: `DashCraft.IntegrationTests` uses `WebApplicationFactory<Program>` plus a
-  shared Testcontainers SQL Server fixture (pinned image above). Tests cover:
+  Testcontainers SQL Server **collection fixture** (pinned image above). Only test classes in the
+  `SqlServerCollection` need Docker. Each test uses its own uniquely named database, so tests never
+  migrate the same database at once. Tests cover:
   - `/health` returns 200 Healthy after migrations;
   - migrations are recorded in `__EFMigrationsHistory`;
-  - `/health` returns 503 with `database: Unhealthy` when the database is unreachable (FR-005).
+  - `/health` returns 503 with `database: Unhealthy` when the database is unreachable (FR-005);
+  - `/health` answers 503 while startup migrations are still retrying (no container needed).
   If Docker is unavailable, Testcontainers fails fast with a clear error.
 - **Frontend**: Vitest + jsdom + React Testing Library. A sample test renders the home page with
   `fetch` stubbed and asserts both healthy and unreachable states.
-- **Runner**: classic VSTest via `dotnet test` (Microsoft.NET.Test.Sdk + xunit.runner.visualstudio)
-  for the broadest IDE and CI support. Unit and integration tests are split with
-  `dotnet test --filter` by project, so unit tests run without Docker.
+- **Runner**: Microsoft.Testing.Platform (MTP), enabled with `"test": { "runner":
+  "Microsoft.Testing.Platform" }` in `global.json`. The plan said VSTest, but xunit.v3 4.x on the
+  .NET 10 SDK refuses VSTest ("Testing with VSTest target is no longer supported"). So the VSTest
+  packages were removed.
+  - Unit tests: `dotnet test --solution src/api/DashCraft.Unit.slnf`, a solution filter with the
+    four layers and their unit test projects. It runs without Docker.
+  - Integration tests: `dotnet test --project tests/api/DashCraft.IntegrationTests`.
+  - MTP ships a telemetry extension (Microsoft.Testing.Extensions.Telemetry → Microsoft.ApplicationInsights,
+    MIT) in **test projects only**. The shipped API sends no telemetry (FR-015). CI sets
+    `TESTINGPLATFORM_TELEMETRY_OPTOUT=1`, and the README documents the opt-out for developers.
 
 ## 10. Continuous integration
 
-- **Decision**: GitHub Actions workflow `.github/workflows/ci.yml` on push and pull request with
-  three jobs:
+- **Decision**: GitHub Actions workflow on push and pull request. The git repository root is the
+  parent folder and the project lives in its `dash-craft/` subfolder. GitHub only reads workflows
+  from the repository root, so the file is `<repo>/.github/workflows/ci.yml` and every job sets
+  `working-directory: dash-craft`. Three jobs:
   - **backend**: `actions/setup-dotnet@v6` (from `global.json`), restore, build with warnings as
     errors, unit tests, integration tests (GitHub `ubuntu-latest` runners include Docker).
   - **frontend**: `actions/setup-node@v7` (Node 24, npm cache), `npm ci`, lint, type-check,
