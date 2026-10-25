@@ -1,4 +1,4 @@
-/spe---
+---
 
 description: "Task list for 001-project-foundation"
 ---
@@ -313,11 +313,11 @@ page shows the API status.
 - [X] T040 [P] [US1] Create `tests/api/DashCraft.Infrastructure.Tests/Persistence/DashCraftDbContextTests.cs`. Build `DashCraftDbContext` with `UseSqlServer("Server=unused;Database=DashCraft")` (no connection is opened) and assert:
   - `context.Model` builds with default schema `dbo`
   - `context.Database.GetMigrations()` contains exactly one migration ending in `_InitialCreate`
-- [ ] T041 [P] [US1] Create `tests/api/DashCraft.IntegrationTests/Health/HealthEndpointTests.cs`, using `SqlServerFixture` + `DashCraftApiFactory`:
+- [X] T041 [P] [US1] Create `tests/api/DashCraft.IntegrationTests/Health/HealthEndpointTests.cs`, using `SqlServerFixture` + `DashCraftApiFactory`:
   - `factory.WaitUntilHealthyAsync(...)` succeeds, and the final `GET /health` returns 200 with content type `application/json`
   - Body deserializes to the contract shape with `status == "Healthy"` and a single check `name == "database"`, `status == "Healthy"`
   - `totalDurationMs >= 0`
-- [ ] T042 [P] [US1] Create `tests/api/DashCraft.IntegrationTests/Persistence/MigrationTests.cs`:
+- [X] T042 [P] [US1] Create `tests/api/DashCraft.IntegrationTests/Persistence/MigrationTests.cs`:
   - After `WaitUntilHealthyAsync`, `SELECT MigrationId FROM dbo.__EFMigrationsHistory` (via `Microsoft.Data.SqlClient`) returns one row ending in `_InitialCreate`
   - Starting a second factory against the same database succeeds and still yields exactly one row (idempotent, FR-006)
 - [X] T043 [P] [US1] Create `tests/api/DashCraft.IntegrationTests/Health/DatabaseUnavailableTests.cs`. Use a `DashCraftApiFactory` with connection string `Server=127.0.0.1,1;Database=DashCraft;User Id=sa;Password=x;Connect Timeout=2;TrustServerCertificate=True` and `ApplyMigrationsOnStartup=false`. No container is needed. Assert:
@@ -408,7 +408,7 @@ page shows the API status.
   - `MSSQL_SA_PASSWORD=DashCraft_Dev_Passw0rd!`
   - `SQL_PORT=14330`, `API_PORT=5080`, `WEB_PORT=8080`
   - `ASPNETCORE_ENVIRONMENT=Production`
-- [ ] T059 [US1] Validate US1 end-to-end per quickstart.md Scenarios 1 to 3:
+- [X] T059 [US1] Validate US1 end-to-end per quickstart.md Scenarios 1 to 3:
   - `docker compose up -d --build`, then confirm `/health` 200 on ports 5080 and 8080, the page renders "API: Healthy", and `__EFMigrationsHistory` has `InitialCreate`
   - Stop and restart `sqlserver` and observe 503 then 200
   - Run `docker compose down` + `up -d` and confirm no data loss
@@ -484,7 +484,7 @@ test code live.
 - [X] T067 [P] [US3] Cross-check documentation consistency:
   - Ports, commands, and paths in `README.md` match `docker-compose.yml`, `.env.example`, `src/web/vite.config.ts`, `launchSettings.json`, and `specs/001-project-foundation/quickstart.md`
   - Fix any mismatch in the file that is wrong
-- [ ] T068 [US3] Do a README walkthrough (quickstart.md Scenario 5) from a clean clone in a temp directory: `git clone` the local repo, follow `README.md` verbatim, and note and fix every step that needs knowledge not written in the README
+- [X] T068 [US3] Do a README walkthrough (quickstart.md Scenario 5) from a clean clone in a temp directory: `git clone` the local repo, follow `README.md` verbatim, and note and fix every step that needs knowledge not written in the README
 
 **Checkpoint**: All three user stories are independently functional.
 
@@ -494,7 +494,7 @@ test code live.
 
 **Purpose**: Final verification against the spec, plan, and constitution
 
-- [ ] T069 [P] Security and secrets review:
+- [X] T069 [P] Security and secrets review:
   - `git status --ignored` shows `.env` ignored
   - `git grep -n "Password="` finds only the documented development-only default in `appsettings.Development.json`, `docker-compose.yml`, `.env.example`, and test fixtures
   - API logs from `docker compose logs api` contain no connection string or password
@@ -508,13 +508,13 @@ test code live.
     - `git grep -nE "https?://"` in `src/` finds no external endpoints other than documentation links
     - With the system running and the host offline (Wi-Fi off), `/health` still returns 200 and the page loads
   - `LICENSE` exists and is MIT
-- [ ] T071 Full clean verification from repo root:
+- [X] T071 Full clean verification from repo root:
   - `dotnet build src/api/DashCraft.slnx -c Release` (0 warnings)
   - The unit test command, then `dotnet test tests/api/DashCraft.IntegrationTests`
   - In `src/web`: `npm ci && npm run lint && npm run typecheck && npm test && npm run build`
   - `docker compose build`
   - Record the results
-- [ ] T072 Run every scenario in `specs/001-project-foundation/quickstart.md` (1 to 6; for 6, validate the workflow syntax locally, e.g. `actionlint` if available, or note that it must be confirmed on first push), and confirm SC-001 to SC-006
+- [X] T072 Run every scenario in `specs/001-project-foundation/quickstart.md` (1 to 6; for 6, validate the workflow syntax locally, e.g. `actionlint` if available, or note that it must be confirmed on first push), and confirm SC-001 to SC-006
 - [X] T073 If any pinned version or design decision changed during implementation, update `specs/001-project-foundation/research.md` and `specs/001-project-foundation/plan.md` to match the delivered state
 
 ---
